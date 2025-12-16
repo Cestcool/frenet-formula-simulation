@@ -9,26 +9,30 @@ clock = pygame.time.Clock()
 dt = 0
 
 position = pygame.math.Vector2((width / 2), (height / 2) + 200)
-velocity = pygame.math.Vector2(100, 0)
+velocity = pygame.math.Vector2(200, 0)
 v0 = velocity
 acceleration = pygame.math.Vector2(0, 0)
 size = 10
 
 attractor_position = pygame.math.Vector2(width/2, height/2)
 attractor_radius = 20
+attractor_weight = 2e17  # masse fictive de l'attracteur
+
+g = 6.67430e-11  # constante gravitationnelle
 
 def frenet(position, velocity, acceleration, attractor_position):
     speed = math.sqrt(velocity.x**2 + velocity.y**2)             # norme de la vitesse
     Un = attractor_position - position                       # vecteur unitaire vers l'attracteur
     d = math.sqrt((Un.x**2 + Un.y**2))                     # distance à l'attracteur
     Un = Un.normalize()                         # normalisation du vecteur unitaire
-    acceleration = (speed**2 / d) * Un            # calcul de l'accélération centripète
+    acceleration = (g * attractor_weight / d**2) * Un            # calcul de l'accélération gravitationnelle
     return acceleration
 
 def movment(position, velocity, acceleration):
     position += velocity * dt + 0.5 * acceleration * dt * dt    # position = -1/2a•t² + v•t
     velocity += acceleration * dt                   # v = a•t
 
+# IA
 def draw_arrow(screen, vec, origin, color="blue", width=3, head_size=10):
     if vec.length_squared() == 0:
         return  # rien à dessiner si vecteur nul
@@ -55,6 +59,7 @@ def draw_arrow(screen, vec, origin, color="blue", width=3, head_size=10):
     pygame.draw.line(screen, color, end, left, width)
     pygame.draw.line(screen, color, end, right, width)
 
+# IA
 def draw_labeled_arrow(screen, vec, origin, color, label, scale=1.0):
     scaled_vec = vec * scale
     draw_arrow(screen, scaled_vec, origin, color)
